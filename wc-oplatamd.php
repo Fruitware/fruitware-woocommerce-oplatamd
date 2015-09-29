@@ -3,7 +3,7 @@
   Plugin Name: OPLATA.MD Payment Gateway for WooCommerce
   Plugin URI: https://github.com/Fruitware/fruitware-woocommerce-oplatamd
   Description: Allows you to use Oplata.md payment gateway with the WooCommerce plugin.
-  Version: 0.1
+  Version: 0.1.1
   Author: Coroliov Oleg, Fruitware SRL
   Author URI: http://fruitware.ru
  */
@@ -128,7 +128,7 @@ function fruitware_woocommerce_oplatamd() {
 		 * @param  WC_Order $order the order object
 		 * @return string transaction URL, or empty string
 		 */
-		public function get_transaction_url( WC_Order $order ) {
+		public function get_transaction_url( $order ) {
 
 			$return_url = '';
 			$transaction_id = $order->get_transaction_id();
