@@ -3,7 +3,7 @@
   Plugin Name: OPLATA.MD Payment Gateway for WooCommerce
   Plugin URI: https://github.com/Fruitware/fruitware-woocommerce-oplatamd
   Description: Allows you to use Oplata.md payment gateway with the WooCommerce plugin.
-  Version: 0.1.1
+  Version: 0.1.2
   Author: Coroliov Oleg, Fruitware SRL
   Author URI: http://fruitware.ru
  */
@@ -98,7 +98,7 @@ function fruitware_woocommerce_oplatamd() {
 			add_action( 'woocommerce_api_wc_' . strtolower( $this->id ), array( $this, 'check_ipn_response' ) );
 
 			// Add custom email fields
-			add_filter('woocommerce_email_order_meta_fields', array( $this, 'email_order_meta_fields' ), 10, 3);
+//			add_filter('woocommerce_email_order_meta_fields', array( $this, 'email_order_meta_fields' ), 10, 3);
 
 			if ( ! $this->is_valid_for_use() ) {
 				$this->enabled = false;
@@ -112,15 +112,15 @@ function fruitware_woocommerce_oplatamd() {
 		 *
 		 * @return array
 		 */
-		public function email_order_meta_fields( array $fields, $sent_to_admin, WC_Order $order ) {
-			$transaction_url = $this->get_transaction_url($order);
-			$fields['transaction_id'] = array(
-				'label' => __( 'Oplata.md invoice', 'woocommerce' ),
-				'value' => '<a href="'.$transaction_url.'">'.$transaction_url.'</a>'
-			);
-
-			return $fields;
-		}
+//		public function email_order_meta_fields( array $fields, $sent_to_admin, WC_Order $order ) {
+//			$transaction_url = $this->get_transaction_url($order);
+//			$fields['transaction_id'] = array(
+//				'label' => __( 'Oplata.md invoice', 'woocommerce' ),
+//				'value' => '<a href="'.$transaction_url.'">'.$transaction_url.'</a>'
+//			);
+//
+//			return $fields;
+//		}
 
 		/**
 		 * Get a link to the transaction on the 3rd party gateway size (if applicable)
