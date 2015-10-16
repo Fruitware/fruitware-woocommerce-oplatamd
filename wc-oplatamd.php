@@ -3,7 +3,7 @@
   Plugin Name: OPLATA.MD Payment Gateway for WooCommerce
   Plugin URI: https://github.com/Fruitware/fruitware-woocommerce-oplatamd
   Description: Allows you to use Oplata.md payment gateway with the WooCommerce plugin.
-  Version: 0.1.2
+  Version: 0.1.3
   Author: Coroliov Oleg, Fruitware SRL
   Author URI: http://fruitware.ru
  */
@@ -41,6 +41,7 @@ if ( ! function_exists( 'add_mdl_currency_symbol' ) ) {
 /* Add a custom payment class to WC
   ------------------------------------------------------------ */
 add_action( 'plugins_loaded', 'fruitware_woocommerce_oplatamd', 0 );
+
 function fruitware_woocommerce_oplatamd() {
 	if ( ! class_exists( 'WC_Payment_Gateway' ) ) {
 		return;
@@ -51,7 +52,6 @@ function fruitware_woocommerce_oplatamd() {
 	}
 
 	class WC_Fruitware_Oplatamd_Gateway extends WC_Payment_Gateway {
-
 		/**
 		 * @var integer
 		 */
@@ -92,7 +92,10 @@ function fruitware_woocommerce_oplatamd() {
 			// Actions
 			add_action( 'woocommerce_receipt_' . strtolower( $this->id ), array( $this, 'receipt_page' ) );
 			// Save options
-			add_action( 'woocommerce_update_options_payment_gateways_' . strtolower( $this->id ), array( $this, 'process_admin_options' ) );
+			add_action( 'woocommerce_update_options_payment_gateways_' . strtolower( $this->id ), array(
+				$this,
+				'process_admin_options'
+			) );
 
 			// Payment listener/API hook
 			add_action( 'woocommerce_api_wc_' . strtolower( $this->id ), array( $this, 'check_ipn_response' ) );
@@ -106,7 +109,7 @@ function fruitware_woocommerce_oplatamd() {
 		}
 
 		/**
-		 * @param array    $fields
+		 * @param array $fields
 		 * @param          $sent_to_admin
 		 * @param WC_Order $order
 		 *
@@ -126,14 +129,15 @@ function fruitware_woocommerce_oplatamd() {
 		 * Get a link to the transaction on the 3rd party gateway size (if applicable)
 		 *
 		 * @param  WC_Order $order the order object
+		 *
 		 * @return string transaction URL, or empty string
 		 */
 		public function get_transaction_url( $order ) {
 
-			$return_url = '';
+			$return_url     = '';
 			$transaction_id = $order->get_transaction_id();
 
-			if (!$transaction_id) {
+			if ( ! $transaction_id ) {
 				$transaction_id = get_post_meta( $order->id, 'oplatamd_transaction_id', true );
 			}
 
@@ -200,7 +204,8 @@ function fruitware_woocommerce_oplatamd() {
 
 			<?php else : ?>
 				<div class="inline error"><p><strong><?php _e( 'Шлюз отключен',
-								'woocommerce' ); ?></strong>: <?php _e( 'OPLATA.MD не поддерживает валюты Вашего магазина.', 'woocommerce' ); ?></p>
+								'woocommerce' ); ?></strong>: <?php _e( 'OPLATA.MD не поддерживает валюты Вашего магазина.', 'woocommerce' ); ?>
+					</p>
 				</div>
 			<?php
 			endif;
@@ -261,12 +266,12 @@ function fruitware_woocommerce_oplatamd() {
 					'label'   => $debug,
 					'default' => 'no'
 				),
-				'sslverify'             => array(
-					'title'   => __( 'Verify ssl certificate', 'woocommerce' ),
-					'type'    => 'checkbox',
+				'sslverify'         => array(
+					'title'       => __( 'Verify ssl certificate', 'woocommerce' ),
+					'type'        => 'checkbox',
 					'label'       => __( 'Включен', 'woocommerce' ),
 					'description' => __( 'Выключать проверку, только если есть проблема с проверкой сертификатов', 'woocommerce' ),
-					'default' => 'yes'
+					'default'     => 'yes'
 				),
 				'description'       => array(
 					'title'       => __( 'Description', 'woocommerce' ),
@@ -331,7 +336,7 @@ function fruitware_woocommerce_oplatamd() {
 				'result'   => 'success',
 				'redirect' => add_query_arg( 'order',
 					$order->id,
-					add_query_arg( 'key', $order->order_key, $order->get_checkout_payment_url(true) ) )
+					add_query_arg( 'key', $order->order_key, $order->get_checkout_payment_url( true ) ) )
 			);
 		}
 
@@ -344,7 +349,7 @@ function fruitware_woocommerce_oplatamd() {
 			}
 
 			$transaction_id = get_post_meta( $order->id, 'oplatamd_transaction_id', true );
-			if (!$transaction_id) {
+			if ( ! $transaction_id ) {
 				$transaction_id = $this->create_invoice( $order );
 			}
 
@@ -354,8 +359,7 @@ function fruitware_woocommerce_oplatamd() {
 
 			if ( is_wp_error( $transaction_id ) ) {
 				echo '<p>' . __( 'Произошка ошибка. Перезагрузите страницу что бы попробовать ещё раз.', 'woocommerce' ) . '</p>';
-			}
-			else {
+			} else {
 				echo '<p>' . __( 'Спасибо за Ваш заказ, пожалуйста, нажмите кнопку ниже, чтобы заплатить.', 'woocommerce' ) . '</p>';
 				echo ' <a class="button alt" href="' . $this->get_gateway_url( '/' . $this->get_lang() . '/invoice/' . $transaction_id ) . '">' . __( 'Оплатить', 'woocommerce' ) . '</a>';
 			}
@@ -367,7 +371,7 @@ function fruitware_woocommerce_oplatamd() {
 		/**
 		 * Check Response
 		 **/
-		public function check_ipn_response( WC_Order $order ) {
+		public function check_transaction( WC_Order $order ) {
 			$invoice = $this->view_invoice( $order );
 //			$invoice = json_decode('{"ordersId":"174","invoiceId":"33961","invoiceAmount":"150.00","invoiceEmail":"email@email.email","invoiceDate":null,"invoiceStatus":"10"}', true); // test
 
@@ -386,22 +390,38 @@ function fruitware_woocommerce_oplatamd() {
 					break;
 				case '5': // Error
 					$order->update_status( 'failed', __( 'Ошибка оплаты', 'woocommerce' ) );
-					wp_redirect( $order->get_cancel_order_url() );
-					exit;
+
+					return $order->get_cancel_order_url();
 					break;
 				case '10': // Paid
 					WC()->cart->empty_cart();
 					$transaction_id = get_post_meta( $order->id, 'oplatamd_transaction_id', true );
-					$order->payment_complete($transaction_id);
-					delete_post_meta($order->id, 'oplatamd_transaction_id');
-					wp_redirect( $this->get_return_url( $order ) );
-					exit;
+					$order->payment_complete( $transaction_id );
+					add_post_meta( $order->id, 'is_payed', 1 );
+
+					delete_post_meta( $order->id, 'oplatamd_transaction_id' );
+
+					return $this->get_return_url( $order );
 					break;
 				case '20': // Money Return
 					$order->update_status( 'refunded', __( 'Платеж возвращён', 'woocommerce' ) );
-					wp_redirect( $order->get_cancel_order_url() );
-					exit;
+					delete_post_meta( $order->id, 'is_payed' );
+
+					return $order->get_cancel_order_url();
 					break;
+			}
+		}
+
+		/**
+		 * Check Response with redirect to front
+		 **/
+		public function check_ipn_response( WC_Order $order ) {
+
+			$url = $this->check_transaction( $order );
+			if ( $url !== false ) {
+				wp_redirect( $url );
+			} else {
+				return false;
 			}
 		}
 
@@ -521,7 +541,7 @@ function fruitware_woocommerce_oplatamd() {
 
 		/**
 		 * @param WC_Order $order
-		 * @param string   $type
+		 * @param string $type
 		 *
 		 * @return string
 		 */
@@ -533,7 +553,8 @@ function fruitware_woocommerce_oplatamd() {
 						'ordersId'         => $order->id,
 						'projectsTitle'    => $this->oplatamd_merchant,
 						'ordersAmount'     => $this->number_format( $order->order_total ),
-						'ordersStatusLink' => $order->get_checkout_payment_url( true ),//get_permalink( woocommerce_get_page_id( 'thanks' ) ),
+						'ordersStatusLink' => $order->get_checkout_payment_url( true ),
+						//get_permalink( woocommerce_get_page_id( 'thanks' ) ),
 						'cartEmail'        => $order->billing_email,
 						'timestamp'        => strtotime( $order->order_date ),
 					);

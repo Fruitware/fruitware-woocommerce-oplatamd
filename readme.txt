@@ -3,7 +3,7 @@ Contributors: Fruitware
 Tags: oplatamd, oplata.md, payment getaway, woo commerce, woocommerce
 Requires at least: 4.0
 Tested up to: 4.3
-Stable tag: 0.1.2
+Stable tag: 0.1.3
 
 Allows you to use OPLATA.MD payment gateway with the WooCommerce plugin.
 
@@ -17,7 +17,7 @@ Allows you to use OPLATA.MD payment gateway with the WooCommerce plugin.
 Если возникнут проблемы, [сообщите об ошибке](https://github.com/Fruitware/fruitware-woocommerce-oplatamd/issues)
 
 == Installation ==
-1. Убедитесь что у вас установлена посленяя версия плагина [WooCommerce](/www.woothemes.com/woocommerce)
+1. Убедитесь что у вас установлена последняя версия плагина [WooCommerce](/www.woothemes.com/woocommerce)
 2. Распакуйте архив и загрузите "fruitware-woocommerce-oplatamd" в папку ваш-домен/wp-content/plugins
 3. Активируйте плагин
 
